@@ -202,7 +202,7 @@ def extract_scenes2(video_path: str, threshold: int):
     prev_hash = imagehash.average_hash(Image.fromarray(prev_frame))
 
     # Initialize variables
-    scene_count = 0
+    scene_count = 1
     frame_count = 0
     scene_writer = None
 
@@ -214,10 +214,11 @@ def extract_scenes2(video_path: str, threshold: int):
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     scene_writer = cv2.VideoWriter(
         scene_filename, fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
+    
     scene_writer.write(prev_frame)
     print(f"Scene {scene_count} extracted")
     
-    scene_count += 1
+
 
     while True:
         # Read the next frame
