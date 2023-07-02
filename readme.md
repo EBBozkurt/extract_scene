@@ -15,14 +15,16 @@ This repository contains scripts for extracting scenes from a video based on dif
 To extract scenes from a video using the preferred method, follow these steps:
 
 1. Clone the repository:
-   git clone https://github.com/EBBozkurt/extract_scene.git
 
-2. Install the necessary dependencies:
-   pip install -r requirements.txt
+   ```git clone https://github.com/EBBozkurt/extract_scene.git```
 
-3. Replace <video_path> with the path to your video file, and <threshold_value> with the desired threshold value for scene change detection.
+3. Install the necessary dependencies:
 
-4. The extracted scenes will be saved as individual video files in the same directory as the input video.
+   ```pip install -r requirements.txt```
+
+5. Replace ```video_path``` with the path to your video file, and ```threshold_value``` with the desired threshold value for scene change detection.
+
+6. The extracted scenes will be saved as individual video files in the same directory as the input video.
 
 
 ## Conclusion
