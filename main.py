@@ -1,6 +1,25 @@
-from services.extract_scene import extract_scenes2
+from services.extract_scene_from_multiple_videos import ExtractScenesFMV
+from services.file_services import check_directory
+import os
 
-video_path = "SnakeEatingInsect.mp4"
+
+
+while True:
+
+    # Take path input from the user 
+    video_path = input("Enter the path of the directory containing the mp4s:")
+
+    # Try to call the function. If there is a error, inform the user.
+    try:
+        if not check_directory(video_path):
+            print("All of the files in the directory provided must be mp4!")
+            continue
+    except:
+        print("Folder not found!")
+        continue
+
+    threshold = int(input("Enter the thresold: ") or 20)
+    break
 
 
 # Threshold-based scene extraction
@@ -12,6 +31,6 @@ video_path = "SnakeEatingInsect.mp4"
 # extract_scenes1(video_path, threshold)
 
 
-# Average hash-based scene extractionn
-threshold = 20
-extract_scenes2(video_path, threshold)
+# Average hash-based scene extraction
+extract = ExtractScenesFMV(video_path,20)
+extract.extract_scenes_fmv()
