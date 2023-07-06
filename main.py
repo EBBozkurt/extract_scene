@@ -12,6 +12,6 @@ video_path = "SnakeEatingInsect.mp4"
 # extract_scenes1(video_path, threshold)
 
 
-# Average hash-based scene extraction
+# Average hash-based scene extractionn
 threshold = 20
 extract_scenes2(video_path, threshold)
