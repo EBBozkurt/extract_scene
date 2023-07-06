@@ -3,7 +3,11 @@ import imagehash
 from PIL import Image
 import os
 
-video_scenes = [] # Global video scenes variable to store video names temporary for the excel
+from .file_services import get_video_name_from_given_path
+
+# Global video scenes variable to store video names temporary for the excel
+video_scenes = []
+
 
 def get_video_scenes():
     # Returns global "video_scenes" variable for the external usage.
@@ -41,9 +45,8 @@ def extract_scenes(video_path: str, scene_threshold: int):
     # Define the codec for the output video
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 
-
     # Get video name without its extension
-    video_name = video_path[video_path.rindex('/')+1:-4]
+    video_name = get_video_name_from_given_path(video_path)
 
     # Define the output video file name
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
@@ -59,7 +62,7 @@ def extract_scenes(video_path: str, scene_threshold: int):
 
     # Initialize video writer for the first scene
     scene_writer = cv2.VideoWriter(
-        os.path.join(scenes_folder,scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
+        os.path.join(scenes_folder, scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
 
     # Write the first frame to the scene video file
     scene_writer.write(prev_frame)
@@ -90,7 +93,7 @@ def extract_scenes(video_path: str, scene_threshold: int):
 
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
-                os.path.join(scenes_folder,scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
+                os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
 
         # Write the frame to the scene video file
         scene_writer.write(frame)
@@ -142,16 +145,16 @@ def extract_scenes1(video_path: str, threshold: float):
 
     # Handle the first scene separately
     scene_count += 1
-    print(f"Video {video_name} Scene {scene_count} starts at frame {frame_count}")
+    print(
+        f"Video {video_name} Scene {scene_count} starts at frame {frame_count}")
 
     # Get video name without its extension
-    video_name = video_path[video_path.rindex('/')+1:-4]
+    video_name = get_video_name_from_given_path(video_path)
 
     # Define the output video file name
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
     # Add scene_filename to the global video_scenes list
     video_scenes.append(scene_filename)
-
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -160,11 +163,10 @@ def extract_scenes1(video_path: str, threshold: float):
     # Create a directory for the scenes
     os.makedirs(scenes_folder)
 
-
     # Initialize the scene writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     scene_writer = cv2.VideoWriter(
-        os.path.join(scenes_folder,scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
+        os.path.join(scenes_folder, scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
     scene_writer.write(prev_frame)
 
     while True:
@@ -198,11 +200,9 @@ def extract_scenes1(video_path: str, threshold: float):
             # Add scene_filename to the global video_scenes list
             video_scenes.append(scene_filename)
 
-
-
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
-                os.path.join(scenes_folder,scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
+                os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
 
         # Write the frame to the scene video file
         if scene_writer is not None:
@@ -220,6 +220,7 @@ def extract_scenes1(video_path: str, threshold: float):
 
     video.release()
 
+
 def extract_scenes2(video_path: str, threshold: int):
     """
     Extracts scenes from a video based on average hash algorithm.
@@ -230,7 +231,7 @@ def extract_scenes2(video_path: str, threshold: int):
 
     Returns:
         None
-    """
+    """    
     # Decleration of global video_scenes variable
     global video_scenes
 
@@ -253,14 +254,13 @@ def extract_scenes2(video_path: str, threshold: int):
     video_scenes = []
 
     # Get video name without its extension
-    video_name = video_path[video_path.rindex('/')+1:-4]
+    video_name = get_video_name_from_given_path(video_path)
 
     # Define the output video file name
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
     video_scenes.append(scene_filename)
-
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -271,12 +271,10 @@ def extract_scenes2(video_path: str, threshold: int):
     # Initialize the scene writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     scene_writer = cv2.VideoWriter(
-        os.path.join(scenes_folder,scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
-    
+        os.path.join(scenes_folder, scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
+
     scene_writer.write(prev_frame)
     print(f"{video_name} Scene {scene_count} extracted")
-    
-
 
     while True:
         # Read the next frame
@@ -305,11 +303,9 @@ def extract_scenes2(video_path: str, threshold: int):
             # Add scene_filename to the global video_scenes list
             video_scenes.append(scene_filename)
 
-
-
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
-                os.path.join(scenes_folder,scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
+                os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
 
         # Write the frame to the scene video file
         if scene_writer is not None:
@@ -323,5 +319,4 @@ def extract_scenes2(video_path: str, threshold: int):
     if scene_writer is not None:
         scene_writer.release()
 
-    
     video.release()
