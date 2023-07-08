@@ -21,7 +21,7 @@ class ExportToExcel:
         # Use the worksheet object to write
         # data via the write() method.
         self.worksheet.write('A1', 'Scene Name')
-        self.worksheet.write('B1', 'Tag')
+        self.worksheet.write('D1', 'Tag')
         
     
     def add_data_to_table(self,filename):
