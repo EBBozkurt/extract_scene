@@ -1,7 +1,6 @@
-test = ["ali","veli","xkraltr"]
-
-print([print(t) for t in test])
-
- 
+import json
 
 
+with open('control2.json','w') as jfile:
+    data = {"control":0}
+    json.dump(data,jfile) 
