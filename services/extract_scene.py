@@ -52,7 +52,7 @@ def extract_scenes(video_path: str, scene_threshold: int):
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
-    video_name.append(scene_filename)
+    video_scenes.append(scene_filename.split(".")[0])
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -154,7 +154,7 @@ def extract_scenes1(video_path: str, threshold: float):
     # Define the output video file name
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename)
+    video_scenes.append(scene_filename.split(".")[0])
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -198,7 +198,7 @@ def extract_scenes1(video_path: str, threshold: float):
             scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
             # Add scene_filename to the global video_scenes list
-            video_scenes.append(scene_filename)
+            video_scenes.append(scene_filename.split(".")[0])
 
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
@@ -260,8 +260,8 @@ def extract_scenes2(video_path: str, threshold: int):
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename)
-
+    video_scenes.append(scene_filename.split(".")[0])
+    
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
 
@@ -301,7 +301,7 @@ def extract_scenes2(video_path: str, threshold: int):
             scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
             # Add scene_filename to the global video_scenes list
-            video_scenes.append(scene_filename)
+            video_scenes.append(scene_filename.split(".")[0])
 
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
