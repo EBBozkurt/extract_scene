@@ -52,7 +52,7 @@ def extract_scenes(video_path: str, scene_threshold: int):
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename.split(".")[0])
+    video_scenes.append(scene_filename[:scene_filename.rfind(".")])
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -154,7 +154,7 @@ def extract_scenes1(video_path: str, threshold: float):
     # Define the output video file name
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename.split(".")[0])
+    video_scenes.append(scene_filename[:scene_filename.rfind(".")])
 
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -198,7 +198,7 @@ def extract_scenes1(video_path: str, threshold: float):
             scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
             # Add scene_filename to the global video_scenes list
-            video_scenes.append(scene_filename.split(".")[0])
+            video_scenes.append(scene_filename[:scene_filename.rfind(".")])
 
             # Initialize the scene writer
             scene_writer = cv2.VideoWriter(
@@ -220,6 +220,18 @@ def extract_scenes1(video_path: str, threshold: float):
 
     video.release()
 
+
+def get_video_name_from_given_path(video_path) -> str:
+    """
+    Returns the video name from the full path
+    """
+    # Extracts the file name from the path
+    video_name = os.path.basename(video_path)
+
+    video_name_without_extension = os.path.splitext(
+        video_name)[0]  # Removes the file extension
+
+    return video_name_without_extension
 
 def extract_scenes2(video_path: str, threshold: int):
     """
@@ -260,7 +272,7 @@ def extract_scenes2(video_path: str, threshold: int):
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename.split(".")[0])
+    video_scenes.append(scene_filename[:scene_filename.rfind(".")])
     
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -272,11 +284,11 @@ def extract_scenes2(video_path: str, threshold: int):
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     scene_writer = cv2.VideoWriter(
         os.path.join(scenes_folder, scene_filename), fourcc, 30, (prev_frame.shape[1], prev_frame.shape[0]))
-
     scene_writer.write(prev_frame)
-    print(f"{video_name} Scene {scene_count} extracted")
-
+    
+    print(f"{video_name} Scene {scene_count} extracted")    
     while True:
+
         # Read the next frame
         ret, frame = video.read()
         if not ret:
@@ -290,22 +302,26 @@ def extract_scenes2(video_path: str, threshold: int):
 
         # Check if a scene change has occurred
         if hash_diff > threshold:
-            scene_count += 1
-            print(f"{video_name} Scene {scene_count} extracted")
+            if frame_count >= 30:
+                scene_count += 1
+                print("Total Frames:",frame_count)
+                frame_count = 0
+                print(f"{video_name} Scene {scene_count} extracted")
+                
 
-            if scene_writer is not None:
-                # Release the previous scene writer
-                scene_writer.release()
+                if scene_writer is not None:
+                    # Release the previous scene writer
+                    scene_writer.release()
 
-            # Define the output video file name
-            scene_filename = f"{video_name}_scene_{scene_count}.mp4"
+                # Define the output video file name
+                scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
-            # Add scene_filename to the global video_scenes list
-            video_scenes.append(scene_filename.split(".")[0])
+                # Add scene_filename to the global video_scenes list
+                video_scenes.append(scene_filename[:scene_filename.rfind(".")])
 
-            # Initialize the scene writer
-            scene_writer = cv2.VideoWriter(
-                os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
+                # Initialize the scene writer
+                scene_writer = cv2.VideoWriter(
+                    os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
 
         # Write the frame to the scene video file
         if scene_writer is not None:
@@ -320,3 +336,5 @@ def extract_scenes2(video_path: str, threshold: int):
         scene_writer.release()
 
     video.release()
+
+

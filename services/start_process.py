@@ -1,4 +1,5 @@
 import os
+import sys
 import cv2
 from services.extract_scene_from_multiple_videos import ExtractScenesFMV
 from services.file_services import check_directory, add_to_txt, read_classes_from_txt
@@ -147,7 +148,7 @@ class StartProcess:
             scene_file_name = self.excel.read_from_excel(f"A{i}")
 
             # Create same scene folder name with the corresponding scene to find exact location of it
-            scene_file_dir = f"{scene_file_name[:scene_file_name.index('_scene')]}_scenes"
+            scene_file_dir = f"{scene_file_name[:scene_file_name.rfind('_scene')]}_scenes"
 
             # Add .mp4 to the end to find location properly
             scene_file = scene_file_name + ".mp4"
@@ -167,17 +168,18 @@ class StartProcess:
                 # Calculate the aspect ratio of the original video
                 aspect_ratio = original_width / original_height
 
-            # Calculate the resized width and height while maintaining the aspect ratio
-            if aspect_ratio > 1:
-                resized_width = target_width
-                resized_height = int(target_width / aspect_ratio)
-            else:
-                resized_height = target_height
-                resized_width = int(target_height * aspect_ratio)
+                # Calculate the resized width and height while maintaining the aspect ratio
+                if aspect_ratio > 1:
+                    resized_width = target_width
+                    resized_height = int(target_width / aspect_ratio)
+                else:
+                    resized_height = target_height
+                    resized_width = int(target_height * aspect_ratio)
 
             # Check if video opened successfully
             if (cap.isOpened()== False): 
                 print("Error opening video stream or file")
+                sys.exit()
 
             # Create numbers list to combine with the class names
             numbers = [ "0" if i==10 else str(i)  for i in range(1,classes[0]+1)]
@@ -277,11 +279,3 @@ class StartProcess:
         # When everything done, release the video capture object
         cap.release()
         print("Classification is done!")
-        
-                
-        
-            
-            
-
-
-    
