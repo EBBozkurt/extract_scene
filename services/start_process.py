@@ -9,10 +9,11 @@ from services.excel_control import ExcelControl
 # Main program process class. All of the processes will be executed through this class
 class StartProcess:
     def __init__(self):
+        self.flag = False
         self.current_dir = os.getcwd() # Get current dir
-
         self.control = JsonControl() # Call json object from JsonControl
         self.start_main_program()
+        
 
         
     def start_main_program(self):
@@ -51,8 +52,10 @@ class StartProcess:
                     if self.control.check_control() == self.excel.get_row_count_from_excel() + 1:
                         print("All scenes classified")
                         break # Program termination point
-
+           
                     self.show_video_process() # Execute video process after input processes
+                    if self.flag == True:
+                        continue
                     break # Program termination point
 
  
@@ -134,14 +137,16 @@ class StartProcess:
 
         """
 
-        # Read class names and number of classes from the txt file provided
-        classes =read_classes_from_txt(os.path.join(self.current_dir,"extracted_scenes","labels.txt"))
  
         # Get row count from the excel file provided
         row_count = self.excel.get_row_count_from_excel()
-
+        self.flag = False
         # Repeat the process exactly the row_count
         for i in range(self.control.check_control(),row_count+1):
+            self.flag = False
+
+            # Read class names and number of classes from the txt file provided
+            classes =read_classes_from_txt(os.path.join(self.current_dir,"extracted_scenes","labels.txt"))
 
             
             # Read scene file name from the cell provided
@@ -154,11 +159,14 @@ class StartProcess:
             scene_file = scene_file_name + ".mp4"
 
             # Specify the target width and height for resizing
-            target_width = 500
-            target_height = 500
+            target_width = 1200
+            target_height = 1200
 
             # Get scene video from the path provided
             cap = cv2.VideoCapture(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
+
+            self.excel.add_to_excel(f"D{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
+
             # Get the original video's width and height
             original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             original_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -188,14 +196,19 @@ class StartProcess:
             # It will be used for the pressed key constraints
             numbers_ords = list(map(ord,numbers))
 
-            # Add 113 which means ord value of the 'q'. Because 'q' value will be allowed always
-            numbers_ords.append(113)
+            # 113  means ord value of the 'q'. Because 'q' value will be allowed for quit operation
+            # 100  means ord value of the 'd'. Because 'd' value will be allowed delete operation
+            # 98  means ord value of the 'b'. Because 'b' value will be allowed back operation
+            other_allowed_ords = [113,100,97,98]
+
+            # Merge number_ords and other_allowed_ords lists
+            numbers_ords.extend(other_allowed_ords)
 
             # Combine class names with the numbers
             classes_with_numbers = list(zip(numbers,classes[1]))
 
             #Inform the user with the number of classes 
-            print(f"You have {classes[0]} options. Press one of them. Press 'q' to quit")
+            print(f"You have {classes[0]} options.\nPress one of them. Press 'q' to quit\nPress 'd' to delete the scene\nPress 'b' to return previous video")
 
             # Print class names with the numbers line-by-line to inform the user
             [print(c) for c in classes_with_numbers]
@@ -227,55 +240,82 @@ class StartProcess:
                         case 49: # If pressed 1
 
                             # Add class number to the "tags" column of the scene through add_to_excel func.
-                            self.excel.add_to_excel(f"D{i}","0")
+                            self.excel.add_to_excel(f"E{i}","0")
                             print("Class number 0 added to excel")
              
                         case 50: # If pressed 2
-                            self.excel.add_to_excel(f"D{i}","1")
+                            self.excel.add_to_excel(f"E{i}","1")
                             print("Class number 1 added to excel")
     
                         case 51: # If pressed 3
-                            self.excel.add_to_excel(f"D{i}","2")
+                            self.excel.add_to_excel(f"E{i}","2")
                             print("Class number 2 added to excel")
                   
                         case 52: # If pressed 4
-                            self.excel.add_to_excel(f"D{i}","3")
+                            self.excel.add_to_excel(f"E{i}","3")
                             print("Class number 3 added to excel")
                  
                         case 53: # If pressed 5
-                            self.excel.add_to_excel(f"D{i}","4")
+                            self.excel.add_to_excel(f"E{i}","4")
                             print("Class number 4 added to excel")
             
                         case 54: # If pressed 6
-                            self.excel.add_to_excel(f"D{i}","5")
+                            self.excel.add_to_excel(f"E{i}","5")
                             print("Class number 5 added to excel")
         
                         case 55: # If pressed 7
-                            self.excel.add_to_excel(f"D{i}","6")
+                            self.excel.add_to_excel(f"E{i}","6")
                             print("Class number 6 added to excel")
                    
                         case 56: # If pressed 8
-                            self.excel.add_to_excel(f"D{i}","7")
+                            self.excel.add_to_excel(f"E{i}","7")
                             print("Class number 7 added to excel")
          
                         case 57: # If pressed 9
-                            self.excel.add_to_excel(f"D{i}","8")
+                            self.excel.add_to_excel(f"E{i}","8")
                             print("Class number 8 added to excel")
   
                         case 48: # If pressed 0
-                            self.excel.add_to_excel(f"D{i}","9")
+                            self.excel.add_to_excel(f"E{i}","9")
                             print("Class number 9 added to excel")
             
-                        case 113: # If pressed q, return 0 (terminate the function)
+                        case 113: # If pressed q, return (terminate the function)
                             print("Exited. Your progress has been saved")
-                            return 0
+                            return 
+                        
+                        case 100:
+                            os.remove(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
+                            self.excel.add_to_excel(f"E{i}","DELETED")
+                            print(f"{scene_file_name} deleted.")
+                        case 97:
+                            new_class = input("Enter new class name(press 'q' to cancel):")
+                            if new_class == "q":
+                                continue
+                            classes[1].append(new_class)
+                            add_to_txt(
+                                os.path.join(self.current_dir,"extracted_scenes","labels.txt"),
+                                [
+                                    f"nc:{classes[0]+1}",
+                                    f"names:{classes[1]}",
+                                ]
+                            )
+                            print("New class added.")
+                            self.flag = True
+                            return
+                        case 98:
+                            self.flag = True
+                            self.control.decrease_control()
+                            return
+
                 
                     cv2.destroyAllWindows() # Closes all the frames
                     break
 
+     
             #  The classification process for this scene has been ended. Increase the control value. 
             self.control.increase_control()
   
         # When everything done, release the video capture object
         cap.release()
         print("Classification is done!")
+

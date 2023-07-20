@@ -26,13 +26,21 @@ class JsonControl:
         return self.data["control"]
     
     def increase_control(self):
-        """Increases control value"""
+        """Increases the control value"""
         self.data["control"] += 1
 
         """Finally, overwrites the control value to control.json file"""
         with open('control.json','w') as jfile:
             json.dump(self.data,jfile)
-    
+
+    def decrease_control(self):
+        """Decreases the control value"""
+        self.data["control"] -= 1
+
+        """Finally, overwrites the control value to control.json file"""
+        with open('control.json','w') as jfile:
+            json.dump(self.data,jfile) 
+
     def reset_control(self):
         """
             Sets 0 to control value. Be careful to use this function!!\n

@@ -22,13 +22,12 @@ class ExtractScenesFMV:
             extract_scenes2(os.path.join(self.path,file),self.threshold) # Cal extarct_scene2 function
             self.add_to_excel() # Call add excel function after the main extract function
 
-
         self.export.close_excel() # Close excel file after the process
 
 
     def add_to_excel(self):
-        for video in get_video_scenes():
-            self.export.add_data_to_table(video) # Add every video name in the list to the excel table
+        for scene in get_video_scenes():
+            self.export.add_scene_info_to_table(scene) # Add every scene name and number of frames in the list to the excel table
 
         print(f"{len(get_video_scenes())} row added to excel.") # Inform the user
 

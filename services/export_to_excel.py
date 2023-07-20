@@ -21,13 +21,16 @@ class ExportToExcel:
         # Use the worksheet object to write
         # data via the write() method.
         self.worksheet.write('A1', 'Scene Name')
-        self.worksheet.write('D1', 'Tag')
-        
+        self.worksheet.write('D1', '#Frames')
+        self.worksheet.write('E1', 'Tags')
+
     
-    def add_data_to_table(self,filename):
+    def add_scene_info_to_table(self,filename):
         # Args: filename-> Filename to add excel table
         self.worksheet.write(f'A{str(self.scene_row)}',filename)
         self.scene_row +=1
+    
+        
     
     def close_excel(self):
         self.workbook.close() # Close the work book for the memory efficiency 
