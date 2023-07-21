@@ -13,6 +13,10 @@ def check_directory(path):
     if os.path.exists("extracted_scenes"):  # Check the file name if exists
         # It deletes the directory include files within that directory
         shutil.rmtree("extracted_scenes")
+    
+    if os.path.exists("exported_scenes.xlsx"): # Check the excel file if exists
+        # It deletes the file
+        os.remove("exported_scenes.xlsx")
 
     for file in os.listdir(path):
         if not os.path.isdir(path):

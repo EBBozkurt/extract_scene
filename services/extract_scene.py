@@ -263,7 +263,6 @@ def extract_scenes2(video_path: str, threshold: int):
     scene_count = 1
     frame_count = 0
     scene_writer = None
-    video_scenes = []
 
     # Get video name without its extension
     video_name = get_video_name_from_given_path(video_path)
@@ -272,7 +271,7 @@ def extract_scenes2(video_path: str, threshold: int):
     scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
     # Add scene_filename to the global video_scenes list
-    video_scenes.append(scene_filename[:scene_filename.rfind(".")])
+    video_scenes.append(scene_filename[:scene_filename.rfind(".")])    
     
     # Create a directory for the scenes extracted.
     scenes_folder = f"extracted_scenes/{video_name}_scenes"
@@ -302,26 +301,32 @@ def extract_scenes2(video_path: str, threshold: int):
 
         # Check if a scene change has occurred
         if hash_diff > threshold:
+
+            # If frame count greater than 30, extract the scene.
             if frame_count >= 30:
                 scene_count += 1
-                print("Total Frames:",frame_count)
-                frame_count = 0
-                print(f"{video_name} Scene {scene_count} extracted")
-                
-
-                if scene_writer is not None:
-                    # Release the previous scene writer
-                    scene_writer.release()
 
                 # Define the output video file name
                 scene_filename = f"{video_name}_scene_{scene_count}.mp4"
 
                 # Add scene_filename to the global video_scenes list
                 video_scenes.append(scene_filename[:scene_filename.rfind(".")])
+                print(f"{video_name} Scene {scene_count} extracted") 
+                
+
+                       
+
+                if scene_writer is not None:
+                    # Release the previous scene writer
+                    scene_writer.release()
+
+                # Reset the frame_count variable for the further scenes
+                frame_count = 0
 
                 # Initialize the scene writer
                 scene_writer = cv2.VideoWriter(
                     os.path.join(scenes_folder, scene_filename), fourcc, 30, (frame.shape[1], frame.shape[0]))
+            
 
         # Write the frame to the scene video file
         if scene_writer is not None:
