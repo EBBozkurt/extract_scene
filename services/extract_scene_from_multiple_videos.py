@@ -22,7 +22,6 @@ class ExtractScenesFMV:
             extract_scenes2(os.path.join(self.path,file),self.threshold) # Cal extarct_scene2 function
             self.add_to_excel() # Call add excel function after the main extract function
 
-        self.export.close_excel() # Close excel file after the process
 
 
     def add_to_excel(self):
