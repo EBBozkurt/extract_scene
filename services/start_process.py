@@ -165,7 +165,7 @@ class StartProcess:
             # Get scene video from the path provided
             cap = cv2.VideoCapture(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
 
-            self.excel.add_to_excel(f"D{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
+            self.excel.add_to_excel(f"B{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
 
             # Get the original video's width and height
             original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -241,43 +241,43 @@ class StartProcess:
                         case 49: # If pressed 1
 
                             # Add class number to the "tags" column of the scene through add_to_excel func.
-                            self.excel.add_to_excel(f"E{i}","0")
+                            self.excel.add_to_excel(f"C{i}","0")
                             print("\nClass number 0 added to excel")
              
                         case 50: # If pressed 2
-                            self.excel.add_to_excel(f"E{i}","1")
+                            self.excel.add_to_excel(f"C{i}","1")
                             print("\nClass number 1 added to excel")
     
                         case 51: # If pressed 3
-                            self.excel.add_to_excel(f"E{i}","2")
+                            self.excel.add_to_excel(f"C{i}","2")
                             print("\nClass number 2 added to excel")
                   
                         case 52: # If pressed 4
-                            self.excel.add_to_excel(f"E{i}","3")
+                            self.excel.add_to_excel(f"C{i}","3")
                             print("\nClass number 3 added to excel")
                  
                         case 53: # If pressed 5
-                            self.excel.add_to_excel(f"E{i}","4")
+                            self.excel.add_to_excel(f"C{i}","4")
                             print("\nClass number 4 added to excel")
             
                         case 54: # If pressed 6
-                            self.excel.add_to_excel(f"E{i}","5")
+                            self.excel.add_to_excel(f"C{i}","5")
                             print("\nClass number 5 added to excel")
         
                         case 55: # If pressed 7
-                            self.excel.add_to_excel(f"E{i}","6")
+                            self.excel.add_to_excel(f"C{i}","6")
                             print("\nClass number 6 added to excel")
                    
                         case 56: # If pressed 8
-                            self.excel.add_to_excel(f"E{i}","7")
+                            self.excel.add_to_excel(f"C{i}","7")
                             print("\nClass number 7 added to excel")
          
                         case 57: # If pressed 9
-                            self.excel.add_to_excel(f"E{i}","8")
+                            self.excel.add_to_excel(f"C{i}","8")
                             print("\nClass number 8 added to excel")
   
                         case 48: # If pressed 0
-                            self.excel.add_to_excel(f"E{i}","9")
+                            self.excel.add_to_excel(f"C{i}","9")
                             print("\nClass number 9 added to excel")
             
                         case 113: # If pressed q, return (terminate the function)
