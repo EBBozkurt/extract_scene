@@ -28,8 +28,8 @@ class ExportToExcel:
         
         # Use the worksheet object to set values
         self.worksheet["A1"].value = 'Scene Name'
-        self.worksheet["D1"].value = '#Frames'
-        self.worksheet["E1"].value = 'Tags'
+        self.worksheet["B1"].value = '#Frames'
+        self.worksheet["C1"].value = 'Tags'
         self.workbook.save(self.path) # Finally, save the excel file
 
     
