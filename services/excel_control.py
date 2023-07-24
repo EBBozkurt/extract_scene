@@ -33,4 +33,12 @@ class ExcelControl:
         """
         It returns row count of the excel file sheet
         """
+        
         return self.sh.max_row # Return row count of the  excel sheet
+    
+    def delete_from_excel(self, row_count: int):
+        """
+        It deletes row given from the excel
+        """
+        self.sh.delete_rows(row_count) # Delete the row provided from the excel
+        self.wb.save(self.excel_path)  # Finally, save the excel file
