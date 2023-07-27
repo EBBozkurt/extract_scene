@@ -70,3 +70,14 @@ def read_classes_from_txt(path):
         # Finally, split the result through comma  
         names = names_line[7:names_line.rfind("]")].replace(" ","").replace("'","").split(",")
         return (nc,names) # Return number of classes and names as tuple
+    
+
+def check_if_all_folder(path : str):
+    for i in os.listdir(path):
+        if not i.startswith(".") and i != "labels.txt":
+            if not os.path.isdir(os.path.join(path,i)):
+                return False
+    return True
+
+
+            
