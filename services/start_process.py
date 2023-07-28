@@ -3,7 +3,7 @@ import sys
 import cv2
 from services.already_extracted_scenes import AlreadyExtractedScenes
 from services.extract_scene_from_multiple_videos import ExtractScenesFMV
-from services.file_services import check_directory, add_to_txt, read_classes_from_txt, read_extracted_scenes_files
+from services.file_services import check_directory, add_to_txt, delete_from_extracted_scenes_files, read_classes_from_txt, read_extracted_scenes_files
 from services.json_control import JsonControl
 from services.excel_control import ExcelControl
 
@@ -13,8 +13,8 @@ class StartProcess:
         self.flag = False # This variable used for loop control
         self.current_dir = os.getcwd() # Get current dir
         self.control = JsonControl() # Call json object from JsonControl
-        self.masterPath = self.control.getMasterPath()
-        self.start_main_program()
+        self.masterPath = self.control.getMasterPath() # Get master path value from the JSON file
+        self.start_main_program() # Start main program process
         
 
         
@@ -31,17 +31,19 @@ class StartProcess:
 
 
 
-                    if self.first_input() == 1:
+                    if self.first_input() == 1: # If firs_input returns 1
+
                         self.input_before_extract() # Execute first input process
                         extract = ExtractScenesFMV(self.video_path,self.threshold) # Call ExtractScenesFMV object with the corresponding args
                         extract.extract_scenes_fmv() # Execute extract process which is using the extract_scene_2 function
-                        self.masterPath = self.control.getMasterPath()
+                        self.masterPath = self.control.getMasterPath() # Update the master path variable
     
 
                     
                     else:
+                        # Call class for the excel operations
                         already_extracted = AlreadyExtractedScenes(os.path.join(self.current_dir,self.masterPath))
-                        already_extracted.add_to_excel()
+                        already_extracted.add_to_excel() # Call add_to_excel function for adding scene names to excel file
 
                     # Call excel object from ExcelControl with the corresponding args
                     self.excel = ExcelControl(
@@ -77,22 +79,24 @@ class StartProcess:
 
  
     def first_input(self):
+        """Get first input from the user. This input will decide the program path"""
         while True:
             userInput = input("You have 2 options to continue.\nEnter 1 to extract scenes from your videos  before tag them.\nEnter 2 to skip extract scene process:")
             if userInput == "1":
+                # Update the master path value
                 self.control.setMasterPath("extracted_scenes")
                 return 1
             elif userInput == "2":
                 while True:
                     masterPathInput = input("Enter the master folder name contains your extracted scenes.\n*Each video scenes should be in different folders:") 
-                    self.control.setMasterPath(masterPathInput)
-                    self.masterPath = self.control.getMasterPath()
-                    if not os.path.isdir(os.path.join(self.current_dir,masterPathInput)):
+                    self.control.setMasterPath(masterPathInput) # Update the master path value
+                    self.masterPath = self.control.getMasterPath() # Update masterPath variable
+                    if not os.path.isdir(os.path.join(self.current_dir,masterPathInput)): # If there is no directory with that name
                         print("Directory not found!\nMake sure your main scene folder is in the same location as the main.py file. \nAlso make sure you entered the filename correctly.")
                         continue
                     break
 
-                self.control.increase_control()
+                self.control.increase_control() # Increase the control value
                 return 2
             else:
                 print("Invalid input! Try again.")
@@ -201,10 +205,10 @@ class StartProcess:
             target_height = 1200
 
             if dirName == "extracted_scenes":
-                print("yeeess")
-                # Get scene video from the path provided
+                # Get scene video from the path if the parameter equals to "extracted_scenes"
                 cap = cv2.VideoCapture(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
             else:
+                # Get scene video from the path if the parameter equals to other
                 cap = cv2.VideoCapture(os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control())))
 
             self.excel.add_to_excel(f"B{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
@@ -327,8 +331,19 @@ class StartProcess:
                             return 
                         
                         case 100: # If pressed 'd'
-                            # Remove the specific scene mp4 file 
-                            os.remove(os.path.join(self.current_dir,dirName,scene_file_dir,scene_file))
+
+                            # Remove the specific scene mp4 file if parameter equals to "extracted_scenes"
+                            if dirName == "extracted_scenes":
+                                os.remove(os.path.join(self.current_dir,dirName,scene_file_dir,scene_file))
+                            else: 
+                                # Remove the specific scene mp4 file if parameter equals to other
+
+                                os.remove((os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control()))))
+
+                                # Remove the scene file path from the txt file
+                                delete_from_extracted_scenes_files(read_extracted_scenes_files(self.control.check_control()))
+
+                                
 
                             # Delete scene row from the excel
                             self.excel.delete_from_excel(i)
