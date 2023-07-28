@@ -13,10 +13,7 @@ def check_directory(path):
     if os.path.exists("extracted_scenes"):  # Check the file name if exists
         # It deletes the directory include files within that directory
         shutil.rmtree("extracted_scenes")
-    
-    if os.path.exists("exported_scenes.xlsx"): # Check the excel file if exists
-        # It deletes the file
-        os.remove("exported_scenes.xlsx")
+
 
     for file in os.listdir(path):
         if not os.path.isdir(path):
@@ -53,8 +50,18 @@ def add_to_txt(filename : str, values : list ):
         for value in values: # Loop iterates for every value in the "values" list
             file.write(value+'\n') # Writes value and goes to the new line
 
+def create_extracted_scenes_files():
+    with open("scene_files.txt","w",encoding="utf-8") as file:
+        file.write(""+"\n"+""+"\n")
 
+def write_extracted_scenes_to_txt(dir,subdir):
+    with open("scene_files.txt","a",encoding="utf-8") as file:
+        file.write(os.path.join(dir,subdir)+"\n")
 
+def read_extracted_scenes_files(pos):
+    with open("scene_files.txt","r",encoding="utf-8") as file:
+        return file.readlines()[pos][:-1]
+    
 def read_classes_from_txt(path):
     """ Read class number and class names from the text file provided\n
         Args: path-> file location of the txt file

@@ -3,7 +3,7 @@ import sys
 import cv2
 from services.already_extracted_scenes import AlreadyExtractedScenes
 from services.extract_scene_from_multiple_videos import ExtractScenesFMV
-from services.file_services import check_directory, add_to_txt, read_classes_from_txt
+from services.file_services import check_directory, add_to_txt, read_classes_from_txt, read_extracted_scenes_files
 from services.json_control import JsonControl
 from services.excel_control import ExcelControl
 
@@ -13,7 +13,7 @@ class StartProcess:
         self.flag = False # This variable used for loop control
         self.current_dir = os.getcwd() # Get current dir
         self.control = JsonControl() # Call json object from JsonControl
-        self.master_path = ""
+        self.masterPath = self.control.getMasterPath()
         self.start_main_program()
         
 
@@ -35,11 +35,12 @@ class StartProcess:
                         self.input_before_extract() # Execute first input process
                         extract = ExtractScenesFMV(self.video_path,self.threshold) # Call ExtractScenesFMV object with the corresponding args
                         extract.extract_scenes_fmv() # Execute extract process which is using the extract_scene_2 function
-                        self.master_path = "extracted_scenes"
+                        self.masterPath = self.control.getMasterPath()
+    
 
                     
                     else:
-                        already_extracted = AlreadyExtractedScenes(os.path.join(self.current_dir,self.master_path))
+                        already_extracted = AlreadyExtractedScenes(os.path.join(self.current_dir,self.masterPath))
                         already_extracted.add_to_excel()
 
                     # Call excel object from ExcelControl with the corresponding args
@@ -53,7 +54,7 @@ class StartProcess:
 
 
                 case 1:
-                    self.input_after_extract(self.master_path) # Execute after extract process
+                    self.input_after_extract(self.masterPath) # Execute after extract process
                 
                 case _: # Execute this case if none of the case above execute
                     
@@ -69,7 +70,7 @@ class StartProcess:
                         print("\nAll scenes classified")
                         break # Program termination point
            
-                    self.show_video_process(self.master_path) # Execute video process after input processes
+                    self.show_video_process(self.masterPath) # Execute video process after input processes
                     if self.flag == True:
                         continue # If flag value is True, than restart the function again
                     break # Program termination point
@@ -77,19 +78,20 @@ class StartProcess:
  
     def first_input(self):
         while True:
-            userInput = input("You have 2 options to continue.\nPress 1 to extract scenes from your videos  before tag them.\nPress 2 to skip extract scene process:")
+            userInput = input("You have 2 options to continue.\nEnter 1 to extract scenes from your videos  before tag them.\nEnter 2 to skip extract scene process:")
             if userInput == "1":
-                self.control.increase_control()
+                self.control.setMasterPath("extracted_scenes")
                 return 1
             elif userInput == "2":
                 while True:
-                    masterPathInput = input("Enter the master folder name contains your extracted scenes.\nEach video scenes should be in different folders!:") 
+                    masterPathInput = input("Enter the master folder name contains your extracted scenes.\n*Each video scenes should be in different folders:") 
+                    self.control.setMasterPath(masterPathInput)
+                    self.masterPath = self.control.getMasterPath()
                     if not os.path.isdir(os.path.join(self.current_dir,masterPathInput)):
                         print("Directory not found!\nMake sure your main scene folder is in the same location as the main.py file. \nAlso make sure you entered the filename correctly.")
                         continue
-
                     break
-                self.master_path = masterPathInput
+
                 self.control.increase_control()
                 return 2
             else:
@@ -199,10 +201,11 @@ class StartProcess:
             target_height = 1200
 
             if dirName == "extracted_scenes":
+                print("yeeess")
                 # Get scene video from the path provided
                 cap = cv2.VideoCapture(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
             else:
-                cap = cv2.VideoCapture(os.path.join(self.current_dir,dirName,scene_file))
+                cap = cv2.VideoCapture(os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control())))
 
             self.excel.add_to_excel(f"B{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
 
