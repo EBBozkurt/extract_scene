@@ -1,3 +1,4 @@
+import os
 import openpyxl # Module  for the excel operations
 
 class ExportToExcel:
@@ -14,6 +15,9 @@ class ExportToExcel:
         self.workbook = openpyxl.Workbook()
         self.path = "exported_scenes.xlsx"
         self.scene_row = 2
+
+        if os.path.exists("exported_scenes.xlsx"): # Check the excel file if exists
+            os.remove("exported_scenes.xlsx")# It deletes the file
 
         # The workbook object is then used to add new
         # worksheet via the add_worksheet() method.

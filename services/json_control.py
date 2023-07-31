@@ -51,4 +51,15 @@ class JsonControl:
         #Finally, overwrites the control value to control.json file
         with open('control.json','w') as jfile:
             json.dump(self.data,jfile)
+
+    def setMasterPath(self,mPath):
+        self.data["masterPath"] = mPath
+
+        with open('control.json','w') as jfile:
+            json.dump(self.data,jfile)
+        
+    def getMasterPath(self):
+        return self.data["masterPath"]
+
+
     
