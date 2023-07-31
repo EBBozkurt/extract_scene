@@ -16,6 +16,7 @@ class AlreadyExtractedScenes:
         for directory in os.listdir(self.master_path): # Traverse for every video
             # Ignore any hidden file like .DS_STORE and labels.txt file 
             if not directory.startswith(".") and directory != "labels.txt":
+             if os.path.isdir(os.path.join(self.master_path,directory)):
                 for subDir in os.listdir(os.path.join(self.master_path,directory)): # Traverse for every scenes
                     if not subDir.startswith(".") : # Ignore any hidden file like .DS_STORE
                         self.excel_control.add_scene_info_to_table(subDir[:subDir.rfind(".")]) # Add to excel except last char which is empty char
