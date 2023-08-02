@@ -334,9 +334,12 @@ class StartProcess:
 
                             # Remove the specific scene mp4 file if parameter equals to "extracted_scenes"
                             if dirName == "extracted_scenes":
+                                cap.release() # Close the video before delete it
                                 os.remove(os.path.join(self.current_dir,dirName,scene_file_dir,scene_file))
+
+                            # Remove the specific scene mp4 file if parameter equals to other
                             else: 
-                                # Remove the specific scene mp4 file if parameter equals to other
+                                cap.release() # Close the video before delete it
 
                                 os.remove((os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control()))))
 
