@@ -8,100 +8,102 @@ from services.json_control import JsonControl
 from services.excel_control import ExcelControl
 
 # Main program process class. All of the processes will be executed through this class
+
+
 class StartProcess:
     def __init__(self):
-        self.flag = False # This variable used for loop control
-        self.current_dir = os.getcwd() # Get current dir
-        self.control = JsonControl() # Call json object from JsonControl
-        self.masterPath = self.control.getMasterPath() # Get master path value from the JSON file
-        self.start_main_program() # Start main program process
-        
+        self.flag = False  # This variable used for loop control
+        self.current_dir = os.getcwd()  # Get current dir
+        self.control = JsonControl()  # Call json object from JsonControl
+        # Get master path value from the JSON file
+        self.masterPath = self.control.getMasterPath()
+        self.start_main_program()  # Start main program process
 
-        
     def start_main_program(self):
         """
         Start main program process.\n
         This function checks control value from json and calls corresponding function
         """
-    
+
         while True:
             match self.control.check_control():
-                
-                case  0: # Check control value and execute according
 
+                case  0:  # Check control value and execute according
 
+                    if self.first_input() == 1:  # If firs_input returns 1
 
-                    if self.first_input() == 1: # If firs_input returns 1
+                        self.input_before_extract()  # Execute first input process
+                        # Call ExtractScenesFMV object with the corresponding args
+                        extract = ExtractScenesFMV(
+                            self.video_path, self.threshold)
+                        # Execute extract process which is using the extract_scene_2 function
+                        extract.extract_scenes_fmv()
+                        self.masterPath = self.control.getMasterPath()  # Update the master path variable
 
-                        self.input_before_extract() # Execute first input process
-                        extract = ExtractScenesFMV(self.video_path,self.threshold) # Call ExtractScenesFMV object with the corresponding args
-                        extract.extract_scenes_fmv() # Execute extract process which is using the extract_scene_2 function
-                        self.masterPath = self.control.getMasterPath() # Update the master path variable
-    
-
-                    
                     else:
                         # Call class for the excel operations
-                        already_extracted = AlreadyExtractedScenes(os.path.join(self.current_dir,self.masterPath))
-                        already_extracted.add_to_excel() # Call add_to_excel function for adding scene names to excel file
+                        already_extracted = AlreadyExtractedScenes(
+                            os.path.join(self.current_dir, self.masterPath))
+                        # Call add_to_excel function for adding scene names to excel file
+                        already_extracted.add_to_excel()
 
                     # Call excel object from ExcelControl with the corresponding args
                     self.excel = ExcelControl(
-                        os.path.join(self.current_dir,"exported_scenes.xlsx"),
+                        os.path.join(self.current_dir, "exported_scenes.xlsx"),
                         "Extracted Scenes"
                     )
-
-                        
-
-
 
                 case 1:
-                    self.input_after_extract(self.masterPath) # Execute after extract process
-                
-                case _: # Execute this case if none of the case above execute
-                    
+                    # Execute after extract process
+                    self.input_after_extract(self.masterPath)
+
+                case _:  # Execute this case if none of the case above execute
+
                     # Call excel object from ExcelControl with the corresponding args
                     self.excel = ExcelControl(
-                        os.path.join(self.current_dir,"exported_scenes.xlsx"),
+                        os.path.join(self.current_dir, "exported_scenes.xlsx"),
                         "Extracted Scenes"
                     )
 
-                    # Inform the user if control value reach to the row_count +1 
+                    # Inform the user if control value reach to the row_count +1
                     # (+1 comes from input process. +1 added to the control value when input_after_extract executed)
                     if self.control.check_control() == self.excel.get_row_count_from_excel() + 1:
                         print("\nAll scenes classified")
-                        break # Program termination point
-           
-                    self.show_video_process(self.masterPath) # Execute video process after input processes
-                    if self.flag == True:
-                        continue # If flag value is True, than restart the function again
-                    break # Program termination point
+                        break  # Program termination point
 
- 
+                    # Execute video process after input processes
+                    self.show_video_process(self.masterPath)
+                    if self.flag == True:
+                        continue  # If flag value is True, than restart the function again
+                    break  # Program termination point
+
     def first_input(self):
         """Get first input from the user. This input will decide the program path"""
         while True:
-            userInput = input("You have 2 options to continue.\nEnter 1 to extract scenes from your videos  before tag them.\nEnter 2 to skip extract scene process:")
+            userInput = input(
+                "You have 2 options to continue.\nEnter 1 to extract scenes from your videos  before tag them.\nEnter 2 to skip extract scene process:")
             if userInput == "1":
                 # Update the master path value
                 self.control.setMasterPath("extracted_scenes")
                 return 1
             elif userInput == "2":
                 while True:
-                    masterPathInput = input("Enter the master folder name contains your extracted scenes.\n*Each video scenes should be in different folders:") 
-                    self.control.setMasterPath(masterPathInput) # Update the master path value
-                    self.masterPath = self.control.getMasterPath() # Update masterPath variable
-                    if not os.path.isdir(os.path.join(self.current_dir,masterPathInput)): # If there is no directory with that name
+                    masterPathInput = input(
+                        "Enter the master folder name contains your extracted scenes.\n*Each video scenes should be in different folders:")
+                    # Update the master path value
+                    self.control.setMasterPath(masterPathInput)
+                    self.masterPath = self.control.getMasterPath()  # Update masterPath variable
+                    # If there is no directory with that name
+                    if not os.path.isdir(os.path.join(self.current_dir, masterPathInput)):
                         print("Directory not found!\nMake sure your main scene folder is in the same location as the main.py file. \nAlso make sure you entered the filename correctly.")
                         continue
                     break
 
-                self.control.increase_control() # Increase the control value
+                self.control.increase_control()  # Increase the control value
                 return 2
             else:
                 print("Invalid input! Try again.")
                 continue
-            
 
     def input_before_extract(self):
         """
@@ -109,11 +111,12 @@ class StartProcess:
         If this function is executed, the value of control = 0
 
         """
-        
+
         while True:
 
-            # Take path input from the user 
-            self.video_path = input("Enter the path of the directory containing the mp4s:")
+            # Take path input from the user
+            self.video_path = input(
+                "Enter the path of the directory containing the mp4s:")
 
             # Try to call the function. If there is a error, inform the user.
             try:
@@ -125,50 +128,52 @@ class StartProcess:
                 continue
 
             self.threshold = int(input("Enter the thresold: ") or 20)
-            break   
+            break
 
-        self.control.increase_control() # The first input process has been ended. Increase the control value.
+        # The first input process has been ended. Increase the control value.
+        self.control.increase_control()
 
-
-    def input_after_extract(self,dirName):
+    def input_after_extract(self, dirName):
         """
         This function takes second input values from the user.
         If this function is executed, the value of control = 1
 
         """
-        while True: # Main input process loop
+        while True:  # Main input process loop
             number_of_class = input("Enter number of class(between 1-10):")
-  
-            try: 
-                number_of_class = int(number_of_class) # Try to convert the input value to the int value
-                if number_of_class <= 0 or number_of_class > 10: # Check if the entered value is within the range
+
+            try:
+                # Try to convert the input value to the int value
+                number_of_class = int(number_of_class)
+                if number_of_class <= 0 or number_of_class > 10:  # Check if the entered value is within the range
                     print("Please type number of class between 1 and 10")
                     continue
 
-                break # If there is no error, break the loop
+                break  # If there is no error, break the loop
             except:
                 print("Error! Please type integer value.")
-                continue # If there is a error, inform the user and start the loop again
+                continue  # If there is a error, inform the user and start the loop again
 
+        class_names = []  # List variable  that stores name of classes will be provided
 
+        # Execute exactly number of classes provided and start from 1
+        for i in range(1, number_of_class+1):
+            class_name = input(f"\nEnter class name {i}:")
+            # Add class name input provided from the user to the list
+            class_names.append(class_name)
 
-        class_names = [] # List variable  that stores name of classes will be provided
-
-        for i in range(1,number_of_class+1): # Execute exactly number of classes provided and start from 1
-            class_name = input(f"\nEnter class name {i}:") 
-            class_names.append(class_name) # Add class name input provided from the user to the list
-
-        # Execute add_to_txt function from file_services with the corresponding args 
+        # Execute add_to_txt function from file_services with the corresponding args
         add_to_txt(
-            os.path.join(self.current_dir,dirName,"labels.txt"),
+            os.path.join(self.current_dir, dirName, "labels.txt"),
             [
                 f"nc:{number_of_class}",
                 f"names:{class_names}",
             ]
         )
-        self.control.increase_control() # The second input process has been ended. Increase the control value. 
+        # The second input process has been ended. Increase the control value.
+        self.control.increase_control()
 
-    def show_video_process(self,dirName):
+    def show_video_process(self, dirName):
         """
         This function shows extracted scenes to the user.\n
         And takes scene class inputs from the user. \n
@@ -179,18 +184,17 @@ class StartProcess:
 
         """
 
- 
         # Get row count from the excel file provided
         row_count = self.excel.get_row_count_from_excel()
         self.flag = False
         # Repeat the process exactly the row_count
-        for i in range(self.control.check_control(),row_count+1):
+        for i in range(self.control.check_control(), row_count+1):
             self.flag = False
 
             # Read class names and number of classes from the txt file provided
-            classes =read_classes_from_txt(os.path.join(self.current_dir,dirName,"labels.txt"))
+            classes = read_classes_from_txt(os.path.join(
+                self.current_dir, dirName, "labels.txt"))
 
-            
             # Read scene file name from the cell provided
             scene_file_name = self.excel.read_from_excel(f"A{i}")
 
@@ -206,12 +210,15 @@ class StartProcess:
 
             if dirName == "extracted_scenes":
                 # Get scene video from the path if the parameter equals to "extracted_scenes"
-                cap = cv2.VideoCapture(os.path.join(self.current_dir,"extracted_scenes",scene_file_dir,scene_file))
+                cap = cv2.VideoCapture(os.path.join(
+                    self.current_dir, "extracted_scenes", scene_file_dir, scene_file))
             else:
                 # Get scene video from the path if the parameter equals to other
-                cap = cv2.VideoCapture(os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control())))
+                cap = cv2.VideoCapture(os.path.join(
+                    self.current_dir, dirName, read_extracted_scenes_files(self.control.check_control())))
 
-            self.excel.add_to_excel(f"B{i}",int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
+            self.excel.add_to_excel(f"B{i}", int(
+                cap.get(cv2.CAP_PROP_FRAME_COUNT)))
 
             # Get the original video's width and height
             original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -231,31 +238,33 @@ class StartProcess:
                     resized_width = int(target_height * aspect_ratio)
 
             # Check if video opened successfully
-            if (cap.isOpened()== False): 
+            if (cap.isOpened() == False):
                 print("Error opening video stream or file")
                 sys.exit()
 
             # Create numbers list to combine with the class names
-            numbers = [ "0" if i==10 else str(i)  for i in range(1,classes[0]+1)]
-           
+            numbers = ["0" if i == 10 else str(i)
+                       for i in range(1, classes[0]+1)]
+
             # Create number_ords list containing ord values of the numbers
             # It will be used for the pressed key constraints
-            numbers_ords = list(map(ord,numbers))
+            numbers_ords = list(map(ord, numbers))
 
             # 113  means ord value of the 'q'. Because 'q' value will be allowed for quit operation
             # 100  means ord value of the 'd'. Because 'd' value will be allowed delete operation
             # 98  means ord value of the 'b'. Because 'b' value will be allowed back operation
-            other_allowed_ords = [113,100,97,98]
+            other_allowed_ords = [113, 100, 97, 98]
 
             # Merge number_ords and other_allowed_ords lists
             numbers_ords.extend(other_allowed_ords)
 
             # Combine class names with the numbers
-            classes_with_numbers = list(zip(numbers,classes[1]))
+            classes_with_numbers = list(zip(numbers, classes[1]))
 
-            #Inform the user with the number of classes 
+            # Inform the user with the number of classes
             print("\n**********************************************")
-            print(f"You have {classes[0]} options.\nPress one of them. Press 'q' to quit\nPress 'd' to delete the scene\nPress 'b' to return previous video\nPress 'a' to add new class")
+            print(
+                f"You have {classes[0]} options.\nPress one of them. Press 'q' to quit\nPress 'd' to delete the scene\nPress 'b' to return previous video\nPress 'a' to add new class")
 
             # Print class names with the numbers line-by-line to inform the user
             [print(c) for c in classes_with_numbers]
@@ -270,8 +279,11 @@ class StartProcess:
                     # Restart the video from the beginning
                     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                     continue
+
                 # Resize the frame to the target width and height while maintaining the aspect ratio
-                resized_frame = cv2.resize(frame, (resized_width, resized_height))
+                resized_frame = cv2.resize(
+                    frame, (resized_width, resized_height))
+
                 # Display the frame
                 cv2.imshow(scene_file_name, resized_frame)
 
@@ -280,120 +292,123 @@ class StartProcess:
 
                 # Check if any key was pressed (key value is not -1)
                 if key != -1:
-                    if key not in numbers_ords : # Check key if in the allowed keys or not
-                            print("Your input is invalid. Check out the number values from the console.")
-                            continue # Restart the while loop
-                    match key: # Check all possibility of the pressed key. Case values are ord values of the keys 
-                        case 49: # If pressed 1
+                    if key not in numbers_ords:  # Check key if in the allowed keys or not
+                        print(
+                            "Your input is invalid. Check out the number values from the console.")
+                        continue  # Restart the while loop
+                    match key:  # Check all possibility of the pressed key. Case values are ord values of the keys
+                        case 49:  # If pressed 1
 
                             # Add class number to the "tags" column of the scene through add_to_excel func.
-                            self.excel.add_to_excel(f"C{i}","0")
+                            self.excel.add_to_excel(f"C{i}", "0")
                             print("\nClass number 0 added to excel")
-             
-                        case 50: # If pressed 2
-                            self.excel.add_to_excel(f"C{i}","1")
+
+                        case 50:  # If pressed 2
+                            self.excel.add_to_excel(f"C{i}", "1")
                             print("\nClass number 1 added to excel")
-    
-                        case 51: # If pressed 3
-                            self.excel.add_to_excel(f"C{i}","2")
+
+                        case 51:  # If pressed 3
+                            self.excel.add_to_excel(f"C{i}", "2")
                             print("\nClass number 2 added to excel")
-                  
-                        case 52: # If pressed 4
-                            self.excel.add_to_excel(f"C{i}","3")
+
+                        case 52:  # If pressed 4
+                            self.excel.add_to_excel(f"C{i}", "3")
                             print("\nClass number 3 added to excel")
-                 
-                        case 53: # If pressed 5
-                            self.excel.add_to_excel(f"C{i}","4")
+
+                        case 53:  # If pressed 5
+                            self.excel.add_to_excel(f"C{i}", "4")
                             print("\nClass number 4 added to excel")
-            
-                        case 54: # If pressed 6
-                            self.excel.add_to_excel(f"C{i}","5")
+
+                        case 54:  # If pressed 6
+                            self.excel.add_to_excel(f"C{i}", "5")
                             print("\nClass number 5 added to excel")
-        
-                        case 55: # If pressed 7
-                            self.excel.add_to_excel(f"C{i}","6")
+
+                        case 55:  # If pressed 7
+                            self.excel.add_to_excel(f"C{i}", "6")
                             print("\nClass number 6 added to excel")
-                   
-                        case 56: # If pressed 8
-                            self.excel.add_to_excel(f"C{i}","7")
+
+                        case 56:  # If pressed 8
+                            self.excel.add_to_excel(f"C{i}", "7")
                             print("\nClass number 7 added to excel")
-         
-                        case 57: # If pressed 9
-                            self.excel.add_to_excel(f"C{i}","8")
+
+                        case 57:  # If pressed 9
+                            self.excel.add_to_excel(f"C{i}", "8")
                             print("\nClass number 8 added to excel")
-  
-                        case 48: # If pressed 0
-                            self.excel.add_to_excel(f"C{i}","9")
+
+                        case 48:  # If pressed 0
+                            self.excel.add_to_excel(f"C{i}", "9")
                             print("\nClass number 9 added to excel")
-            
-                        case 113: # If pressed q, return (terminate the function)
+
+                        # If pressed q, return (terminate the function)
+                        case 113:
                             print("\nExited. Your progress has been saved")
-                            return 
-                        
-                        case 100: # If pressed 'd'
+                            return
+
+                        case 100:  # If pressed 'd'
 
                             # Remove the specific scene mp4 file if parameter equals to "extracted_scenes"
                             if dirName == "extracted_scenes":
-                                cap.release() # Close the video before delete it
-                                os.remove(os.path.join(self.current_dir,dirName,scene_file_dir,scene_file))
+                                cap.release()  # Close the video before delete it
+                                os.remove(os.path.join(
+                                    self.current_dir, dirName, scene_file_dir, scene_file))
 
                             # Remove the specific scene mp4 file if parameter equals to other
-                            else: 
-                                cap.release() # Close the video before delete it
+                            else:
+                                cap.release()  # Close the video before delete it
 
-                                os.remove((os.path.join(self.current_dir,dirName,read_extracted_scenes_files(self.control.check_control()))))
+                                os.remove((os.path.join(self.current_dir, dirName, read_extracted_scenes_files(
+                                    self.control.check_control()))))
 
                                 # Remove the scene file path from the txt file
-                                delete_from_extracted_scenes_files(read_extracted_scenes_files(self.control.check_control()))
-
-                                
+                                delete_from_extracted_scenes_files(
+                                    read_extracted_scenes_files(self.control.check_control()))
 
                             # Delete scene row from the excel
                             self.excel.delete_from_excel(i)
 
                             print(f"\n{scene_file_name} deleted.")
 
-                        case 97: # If pressed 'a'
+                        case 97:  # If pressed 'a'
                             # Take input from the user
-                            new_class = input("\nEnter new class name(press 'q' to cancel):")
-                            
+                            new_class = input(
+                                "\nEnter new class name(press 'q' to cancel):")
+
                             # If input value = 'q', cancel the process
-                            if new_class == "q": 
+                            if new_class == "q":
                                 continue
                             # Add new class name to the list in the text file
                             classes[1].append(new_class)
 
                             # Add the final class list and number of classes to the txt file
                             add_to_txt(
-                                os.path.join(self.current_dir,dirName,"labels.txt"),
+                                os.path.join(self.current_dir,
+                                             dirName, "labels.txt"),
                                 [
                                     f"nc:{classes[0]+1}",
                                     f"names:{classes[1]}",
                                 ]
                             )
                             print("\nNew class added.")
-                            self.flag = True # Set flag value as True
-                            cv2.destroyAllWindows() # Closes all the frames
-                            return
-                        
-                        case 98: # If pressed 'b'
-                            if i == 2: # If control value = 2 , do not go back anymore.
-                                print("\nThis is first video. Can not go back anymore")
-                            else:
-                                self.control.decrease_control() # Decrease control value 
-                                cv2.destroyAllWindows() # Closes all the frames
-                            self.flag = True # Set flag value as True. 
+                            self.flag = True  # Set flag value as True
+                            cv2.destroyAllWindows()  # Closes all the frames
                             return
 
-                
-                    cv2.destroyAllWindows() # Closes all the frames
+                        case 98:  # If pressed 'b'
+                            if i == 2:  # If control value = 2 , do not go back anymore.
+                                print(
+                                    "\nThis is first video. Can not go back anymore")
+                            else:
+                                self.control.decrease_control()  # Decrease control value
+                                cv2.destroyAllWindows()  # Closes all the frames
+                            self.flag = True  # Set flag value as True.
+                            return
+
+                    cv2.destroyAllWindows()  # Closes all the frames
                     break
 
-     
-            #  The classification process for this scene has been ended. Increase the control value. 
+            #  The classification process for this scene has been ended. Increase the control value.
             self.control.increase_control()
-  
+
         # When everything done, release the video capture object
         cap.release()
         print("\nClassification is done!")
-
